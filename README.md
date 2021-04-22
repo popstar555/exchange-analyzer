@@ -26,7 +26,7 @@ With this sample, you can:
 git clone https://github.com/popstar555/exchange-analyzer.git
 
 ```
-2. Install dependencies with npm:
+2. Install dependencies with npm in the project folder:
 
 ``` bash
 npm install
