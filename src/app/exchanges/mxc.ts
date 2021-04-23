@@ -16,7 +16,7 @@ export class XMxc extends Exchange{
     this._baseUrl = "https://contract.mxc.com/api/v1/";
   }
   
-  getFuningRate(): Observable<IFundingRate[]> {
+  getFuningRate(): Promise<IFundingRate[]> {
     return this._http.get<IMxcContractsResponse>(this._baseUrl+"contract/detail")
     .pipe(
       map(async response => {
@@ -24,21 +24,23 @@ export class XMxc extends Exchange{
         if(response.success && response.data && response.data.length>0){
           const contracts = response.data;
           for(let i=0; i<contracts.length; i++){
-            const fundingResponse = await this._http.get<IMxcFundingRateResponse>(this._baseUrl+"contract/funding_rate/"+contracts[i].symbol).toPromise();
-            if(fundingResponse.success && fundingResponse.data){
-              const fundingRateObj:IFundingRate ={
-                symbol: `${contracts[i].baseCoin}${contracts[i].quoteCoin}`,
-                rate: fundingResponse.data.fundingRate,
-                time: fundingResponse.data.timestamp
+            if(contracts[i].symbol.endsWith('USDT')){
+              const fundingResponse = await this._http.get<IMxcFundingRateResponse>(this._baseUrl+"contract/funding_rate/"+contracts[i].symbol).toPromise();
+              if(fundingResponse.success && fundingResponse.data){
+                const fundingRateObj:IFundingRate ={
+                  symbol: `${contracts[i].baseCoin}${contracts[i].quoteCoin}`,
+                  rate: fundingResponse.data.fundingRate,
+                  time: fundingResponse.data.timestamp
+                }
+                result.push(fundingRateObj);
               }
-              result.push(fundingRateObj);
             }
           }
         }
         return result;
       }),
       catchError(err => of(null))
-    );
+    ).toPromise();
   }
 }
 

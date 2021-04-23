@@ -16,24 +16,28 @@ export class XBitmex extends Exchange{
     this._baseUrl = "https://www.bitmex.com/api/v1/";
   }
   
-  getFuningRate(): Observable<IFundingRate[]> {
-    return  this._http.get<IBitmexFundingRate[]>(this._baseUrl+"funding?count=200&start=0&reverse=true")
+  getFuningRate(): Promise<IFundingRate[]> {
+    const startTime = new Date();
+    startTime.setHours(startTime.getHours() - 7);
+    return  this._http.get<IBitmexFundingRate[]>(this._baseUrl+"funding?count=200&start=0&startTime="+startTime.toUTCString())
     .pipe(
       map(data => {
         const result:IFundingRate[] = [];
         if(data){
           for(let i=0; i<data.length; i++) {
-            result.push({
-              symbol: this.filterSymbol(data[i].symbol),
-              rate: data[i].fundingRate,
-              time: data[i].timestamp,
-            });
+            if(data[i].symbol.endsWith('USDT')){
+              result.push({
+                symbol: this.filterSymbol(data[i].symbol),
+                rate: data[i].fundingRate,
+                time: data[i].timestamp,
+              });
+            }
           }
         }
         return result;
       }),
       catchError(err => of([]))
-    );
+    ).toPromise();
   }
 
   filterSymbol(symbol:string){

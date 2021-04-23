@@ -23,7 +23,7 @@ export abstract class Exchange {
     this._http = httpClient;
   }
 
-  abstract getFuningRate():Observable<IFundingRate[]>;
+  abstract getFuningRate():Promise<IFundingRate[]>;
 }
 
 

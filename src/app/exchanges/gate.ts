@@ -16,7 +16,7 @@ export class XGate extends Exchange{
     this._baseUrl = "https://fx-api.gateio.ws/api/v4/";
   }
   
-  getFuningRate(): Observable<IFundingRate[]> {
+  getFuningRate(): Promise<IFundingRate[]> {
     return  this._http.get<IGateContract[]>(this._baseUrl+"futures/usdt/contracts")
     .pipe(
       map(data => {
@@ -32,7 +32,7 @@ export class XGate extends Exchange{
         return result;
       }),
       catchError(err => of([]))
-    );
+    ).toPromise();
   }
 }
 

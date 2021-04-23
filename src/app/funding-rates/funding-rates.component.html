@@ -18,7 +18,7 @@
   
       <ng-container matColumnDef="symbol" sticky>
         <th mat-header-cell *matHeaderCellDef mat-sort-header> Symbol </th>
-        <td mat-cell *matCellDef="let row"> {{row.symbol}} </td>
+        <td mat-cell *matCellDef="let row" class="text-left"> {{row.symbol}} </td>
       </ng-container>
   
       <ng-container matColumnDef="Binance">
@@ -66,10 +66,10 @@
         <td mat-cell *matCellDef="let row"> {{row.Poloniex| percent:'1.5-5'}} </td>
       </ng-container>
   
-      <ng-container matColumnDef="Kraken">
+      <!-- <ng-container matColumnDef="Kraken">
         <th mat-header-cell *matHeaderCellDef mat-sort-header> Kraken </th>
         <td mat-cell *matCellDef="let row"> {{row.Kraken| percent:'1.5-5'}} </td>
-      </ng-container>
+      </ng-container> -->
   
       <ng-container matColumnDef="dYdX">
         <th mat-header-cell *matHeaderCellDef mat-sort-header> dYdX </th>

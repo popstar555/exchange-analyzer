@@ -35,11 +35,13 @@ export class XDelta{
             msg => {
               if(msg && msg.type=="funding_rate"){
                 const fr_res = msg as IDeltaFundingRate;
-                const fr:IFundingRate={
-                  symbol: fr_res.symbol,
-                  rate: fr_res.funding_rate/100
+                if(fr_res.symbol.endsWith('BTCT')){
+                  const fr:IFundingRate={
+                    symbol: fr_res.symbol,
+                    rate: fr_res.funding_rate/100
+                  }
+                  onFundingRate(fr);
                 }
-                onFundingRate(fr);
               }
             },
             err => {

@@ -16,7 +16,7 @@ export class XHuobi extends Exchange{
     this._baseUrl = "https://api.hbdm.com/linear-swap-api/v1/";
   }
   
-  getFuningRate(): Observable<IFundingRate[]> {
+  getFuningRate(): Promise<IFundingRate[]> {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
@@ -39,7 +39,7 @@ export class XHuobi extends Exchange{
         return result;
       }),
       catchError(err => of([])),
-    );
+    ).toPromise();
   }
 }
 

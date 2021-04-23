@@ -19,7 +19,7 @@ export class XKuCoin extends Exchange{
     this._baseUrl = "https://api-futures.kucoin.com/api/v1/";
   }
   
-  getFuningRate(): Observable<IFundingRate[]> {
+  getFuningRate(): Promise<IFundingRate[]> {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
@@ -32,20 +32,23 @@ export class XKuCoin extends Exchange{
         if(resp.data && resp.data.length>0){
           const data = resp.data;
           for(let i=0; i<data.length; i++) {
-            result.push({
-              symbol: `${this.filterSymbol(data[i].baseCurrency)}${this.filterSymbol(data[i].quoteCurrency)}`,
-              rate: data[i].fundingFeeRate,
-            });
+            if(data[i].quoteCurrency!='USD'){
+              result.push({
+                symbol: `${this.filterSymbol(data[i].baseCurrency)}${this.filterSymbol(data[i].quoteCurrency)}`,
+                rate: data[i].fundingFeeRate,
+              });
+            }
           }
         }
         
         return result;
       }),
       catchError(err => of([]))
-    );
+    ).toPromise();
   }
 
   filterSymbol(symbol: string){
+
     return symbol.replace(/^XBT$/, 'BTC');
   }
 }

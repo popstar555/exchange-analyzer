@@ -16,8 +16,8 @@ export class XBinance extends Exchange{
     this._baseUrl = "https://www.binance.com/fapi/v1/";
   }
   
-  getFuningRate(): Observable<IFundingRate[]> {
-    return  this._http.get<IBinanceFundingRate[]>(this._baseUrl+"premiumIndex")
+  getFuningRate(): Promise<IFundingRate[]> {
+    return this._http.get<IBinanceFundingRate[]>(this._baseUrl+"premiumIndex")
     .pipe(
       map(data => {
         const result:IFundingRate[] = [];
@@ -34,7 +34,7 @@ export class XBinance extends Exchange{
         return result;
       }),
       catchError(err => of([]))
-    );
+    ).toPromise();
   }
 }
 

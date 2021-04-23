@@ -19,7 +19,7 @@ export class XBitfinex extends Exchange{
     this._baseUrl = "https://api-pub.bitfinex.com/v2/";
   }
   
-  getFuningRate(): Observable<IFundingRate[]> {
+  getFuningRate(): Promise<IFundingRate[]> {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
@@ -33,10 +33,10 @@ export class XBitfinex extends Exchange{
           for(let i=0; i<data.length; i++) {
             const _symbol_arr = data[i][0].split(":");
             const base = this.filterSymbol(_symbol_arr[0]);
-            const quot = this.filterSymbol(_symbol_arr[1]);
-            if(base!==false && quot!==false){
+            const quote = this.filterSymbol(_symbol_arr[1]);
+            if(base!==false && quote!==false && quote=='USDT'){
               result.push({
-                symbol: `${base}${quot}`,
+                symbol: `${base}${quote}`,
                 rate: data[i][12],
                 time: data[i][1],
               });
@@ -46,7 +46,7 @@ export class XBitfinex extends Exchange{
         return result;
       }),
       catchError(err => of([]))
-    );
+    ).toPromise();
   }
 
   filterSymbol(symbol:string){

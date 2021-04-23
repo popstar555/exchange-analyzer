@@ -16,7 +16,7 @@ export class XKraken extends Exchange{
     this._baseUrl = "https://futures.kraken.com/derivatives/api/v3/";
   }
   
-  getFuningRate(): Observable<IFundingRate[]> {
+  getFuningRate(): Promise<IFundingRate[]> {
     return  this._http.get<IKrakenTickersResponse>(this._baseUrl+"tickers")
     .pipe(
       map(resp => {

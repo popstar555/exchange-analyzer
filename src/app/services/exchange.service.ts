@@ -35,7 +35,7 @@ export class ExchangeService {
       new XBitmex(this.http),
       new XDeribit(this.http),
       new XPoloniex(this.http),
-      new XKraken(this.http),
+      //new XKraken(this.http),
       new XdYdX(this.http),
       new XGate(this.http),
       new XMxc(this.http),

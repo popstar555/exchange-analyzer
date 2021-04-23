@@ -16,7 +16,7 @@ export class XDeribit extends Exchange{
     this._baseUrl = "https://www.deribit.com/api/v2/";
   }
   
-  getFuningRate(): Observable<IFundingRate[]> {
+  getFuningRate(): Promise<IFundingRate[]> {
     const startTime = new Date();
     startTime.setHours(startTime.getHours() -8 );
     const endTime = new Date();
@@ -25,11 +25,12 @@ export class XDeribit extends Exchange{
     return combineLatest(res_btc, res_eth)
       .pipe(
         map((data)=> {
-          const result:IFundingRate[] = [data[0], data[1]];
+          const result:IFundingRate[]=[];
+          // no usdt
           return result;
         }),
         catchError(err => of([]))
-      );
+      ).toPromise();
   }
 
   getFundingRateBySymbol(symbol:string, starttime:Date, endtime:Date):Observable<IFundingRate>{

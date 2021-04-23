@@ -19,7 +19,7 @@ export class XPoloniex extends Exchange{
     this._baseUrl = "https://futures-api.poloniex.com/api/v1/";
   }
   
-  getFuningRate(): Observable<IFundingRate[]> {
+  getFuningRate(): Promise<IFundingRate[]> {
     const now = new Date().getTime().toString();
     return  this._http.get<IPoloniexContractsResponse>(this._baseUrl+"contracts/active")
     .pipe(
@@ -40,7 +40,7 @@ export class XPoloniex extends Exchange{
         return result;
       }),
       catchError(err => of([]))
-    );
+    ).toPromise();
   }
 
   // getSignature(

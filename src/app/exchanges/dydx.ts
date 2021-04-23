@@ -4,88 +4,140 @@ import { Exchange } from "./base-exchange";
 import { catchError, map } from 'rxjs/operators';
 import { combineLatest, Observable, of } from "rxjs";
 
-const dYdX_markets=[
-  { base: 'ETH', quote: 'DAI' },
-  { base: 'ETH', quote: 'USDC' },
-  { base: 'DAI', quote: 'USDC' },
-  { base: 'BTC', quote: 'USD' },
-  { base: 'ETH', quote: 'USD' },
-  { base: 'LINK', quote: 'USD' },
-];
-export class XdYdX extends Exchange{
+export class XdYdX extends Exchange {
 
   constructor(
     httpClient: HttpClient,
     apiKey?: string,
     apiSecret?: string
-  ){
+  ) {
     super(httpClient, apiKey, apiSecret);
     this._name = "dYdX";
     this._baseUrl = "https://api.dydx.exchange/v3/";
   }
-  
-  getFuningRate(): Observable<IFundingRate[]> {
-    const startTime = new Date();
-    startTime.setHours(startTime.getHours() -8 );
-    const endTime = new Date();
-    const responses:Observable<IFundingRate>[] = [];
-    for(let i=0; i<dYdX_markets.length; i++) {
-      responses.push(this.getFundingRateBySymbol(dYdX_markets[i].base, dYdX_markets[i].quote));
+
+  // getFuningRate(): Promise<IFundingRate[]> {
+  //   const startTime = new Date();
+  //   startTime.setHours(startTime.getHours() -8 );
+  //   const endTime = new Date();
+  //   const responses:Observable<IFundingRate>[] = [];
+
+  //   this.getMarketList()
+  //   for(let i=0; i<dYdX_markets.length; i++) {
+  //     responses.push(this.getFundingRateBySymbol(dYdX_markets[i].base, dYdX_markets[i].quote));
+  //   }
+  //   return combineLatest(responses)
+  //     .pipe(
+  //       map((data)=> {
+  //         const result:IFundingRate[] = [];
+  //         if(data){
+  //           for(let i=0; i<data.length;i++){
+  //             if(data[i]){
+  //               result.push(data[i]);
+  //             }
+  //           }
+  //         }
+  //         return result;
+  //       }),
+  //       catchError(err => of([]))
+  //     );
+  // }
+
+  async getFuningRate(): Promise<IFundingRate[]> {
+    const dYdX_markets = await this.getMarketList();
+    const responses: Observable<IFundingRate>[] = [];
+    for (let i = 0; i < dYdX_markets.length; i++) {
+      responses.push(this.getFundingRateBySymbol(dYdX_markets[i]));
     }
     return combineLatest(responses)
+    .pipe(
+      map(data=>{
+        const result:IFundingRate[]=[];
+        for(let i=0; i<data.length; i++) {
+          if(data[i])
+            result.push(data[i]);
+        }
+        return result;
+      })
+    ).toPromise();
+  }
+
+  filterSymbol(symbol: string){
+    return symbol.replace(/^USD$/gi, 'USDT');
+  }
+  
+  getFundingRateBySymbol(market: IMarket): Observable < IFundingRate | null > {
+    return  this._http.get<IdYdXHistoricalFundingResponse>(this._baseUrl + "historical-funding/" + market.market)
       .pipe(
-        map((data)=> {
-          const result:IFundingRate[] = [];
-          if(data){
-            for(let i=0; i<data.length;i++){
-              if(data[i]){
-                result.push(data[i]);
-              }
+        map(data => {
+          if (data && data.historicalFunding && data.historicalFunding.length > 0) {
+            try {
+              const result: IFundingRate = {
+                symbol: `${this.filterSymbol(market.base)}${this.filterSymbol(market.quote)}`,
+                rate: data.historicalFunding[0].rate,
+              };
+              return result;
+            }
+            catch (error) {
+              return null;
             }
           }
-          return result;
+          else {
+            return null
+          }
         }),
-        catchError(err => of([]))
+        catchError(err => of(null))
       );
   }
 
-  getFundingRateBySymbol(base:string, quote:string):Observable<IFundingRate|null>{
-    const pair = `${base}-${quote}`;
-    return  this._http.get<IdXdYHistoricalFundingResponse>(this._baseUrl+"historical-funding/"+pair)
+  async getMarketList(){
+    return await this._http.get<IdYdXMarketsResponse>(this._baseUrl + "markets")
     .pipe(
       map(data => {
-        if(data && data.historicalFunding && data.historicalFunding.length>0){
-          try{
-            const result:IFundingRate = {
-              symbol: `${this.filterSymbol(base)}${this.filterSymbol(quote)}`,
-              rate: data.historicalFunding[0].rate,
-            };
-            return result;  
+        if (data && data.markets) {
+          const dYdX_markets: IMarket[] = [];
+          try {
+            for (var market in data.markets) {
+              const m = data.markets[market] as IMarket;
+              if (m.type == 'PERPETUAL') {
+                dYdX_markets.push(m);
+              }
+            }
+            return dYdX_markets;
           }
-          catch(error){
-            return null;
+          catch (error) {
+            return [];
           }
         }
-        else{
-          return null
+        else {
+          return []
         }
       }),
-      catchError(err => of(null))
-    );
+      catchError(err => of([]))
+    ).toPromise();
   }
 
-  filterSymbol(symbol:string){
-    return symbol.replace(/^USD$/gi, 'USDT');
-  }
+
 }
 
-interface IdXdYHistoricalFunding{
+interface IdYdXHistoricalFunding {
   market: string;
   rate: number;
   price: number;
   qffectiveAt: Date;
 }
 
-interface IdXdYHistoricalFundingResponse{
-  historicalFunding:IdXdYHistoricalFunding[]
+interface IdYdXHistoricalFundingResponse {
+  historicalFunding: IdYdXHistoricalFunding[]
+}
+
+interface IdYdXMarketsResponse {
+  markets: any;
+}
+
+interface IMarket {
+  market: string;
+  base: string;
+  quote: string;
+  type: string;
 }

@@ -25,7 +25,7 @@ export class FundingRatesComponent implements OnInit, AfterViewInit {
     "Bitmex",
     "Deribit",
     "Poloniex",
-    "Kraken",
+//    "Kraken",
     "dYdX",
     "Gate",
     "MXC",
@@ -53,7 +53,6 @@ export class FundingRatesComponent implements OnInit, AfterViewInit {
     this.dataSource.sort = this.sort;
 
     this.refresh();
-
   }
 
   ngOnInit(): void {
@@ -71,7 +70,7 @@ export class FundingRatesComponent implements OnInit, AfterViewInit {
 
     for (let xIndex = 0; xIndex < x.length; xIndex++) {
       const xKey = x[xIndex].name;
-      const data = await x[xIndex].getFuningRate().toPromise();
+      const data = await x[xIndex].getFuningRate();
 
       for (let i = 0; i < data.length; i++) {
         if (data[i] !== null && data[i] !== undefined) {
@@ -144,7 +143,7 @@ interface RowData {
   Bitmex: number | null;
   Deribit: number | null;
   Poloniex: number | null;
-  Kraken: number | null;
+//  Kraken: number | null;
   dYdX: number | null;
   Gate: number | null;
   MXC: number | null;
@@ -165,7 +164,7 @@ function createEmptyRow(symbol: string) {
     Bitmex: null,
     Deribit: null,
     Poloniex: null,
-    Kraken: null,
+//    Kraken: null,
     dYdX: null,
     Gate: null,
     MXC: null,

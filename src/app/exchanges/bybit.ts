@@ -16,7 +16,7 @@ export class XBybit extends Exchange{
     this._baseUrl = "https://api.bybit.com/v2/";
   }
   
-  getFuningRate(): Observable<IFundingRate[]> {
+  getFuningRate(): Promise<IFundingRate[]> {
     return  this._http.get<IBybitTickersResponse>(this._baseUrl+"public/tickers")
     .pipe(
       map(resp => {
@@ -24,16 +24,18 @@ export class XBybit extends Exchange{
         if(resp.ret_msg=="OK" && resp.result && resp.result.length>0){
           const data = resp.result;
           for(let i=0; i<data.length; i++) {
-            result.push({
-              symbol: data[i].symbol,
-              rate: data[i].funding_rate,
-            });
+            if(data[i].symbol.endsWith('USDT')){
+              result.push({
+                symbol: data[i].symbol,
+                rate: data[i].funding_rate,
+              });
+            }
           }
         }
         return result;
       }),
       catchError(err => of([]))
-    );
+    ).toPromise();
   }
 }
 

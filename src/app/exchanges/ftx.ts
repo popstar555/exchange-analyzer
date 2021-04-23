@@ -16,7 +16,7 @@ export class XFTX extends Exchange{
     this._baseUrl = "https://ftx.com/api/";
   }
   
-  getFuningRate(): Observable<IFundingRate[]> {
+  getFuningRate(): Promise<IFundingRate[]> {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
@@ -46,7 +46,7 @@ export class XFTX extends Exchange{
         return result;
       }),
       catchError(err => of([]))
-    );
+    ).toPromise();
   }
 }
 
