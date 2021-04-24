@@ -72,6 +72,7 @@ export class XdYdX extends Exchange {
         map(data => {
           if (data && data.historicalFunding && data.historicalFunding.length > 0) {
             try {
+              console.log('first item=',data.historicalFunding[0]);
               const result: IFundingRate = {
                 symbol: `${this.filterSymbol(market.base)}${this.filterSymbol(market.quote)}`,
                 rate: data.historicalFunding[0].rate,
@@ -97,8 +98,13 @@ export class XdYdX extends Exchange {
         if (data && data.markets) {
           const dYdX_markets: IMarket[] = [];
           try {
-            for (var market in data.markets) {
-              const m = data.markets[market] as IMarket;
+            for (var market in data.markets) {              
+              const m:IMarket = {
+                market: data.markets[market].market,
+                base: data.markets[market].baseAsset,
+                quote: data.markets[market].quoteAsset,
+                type: data.markets[market].type,
+              }
               if (m.type == 'PERPETUAL') {
                 dYdX_markets.push(m);
               }

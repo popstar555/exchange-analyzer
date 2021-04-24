@@ -22,7 +22,10 @@ export class XFTX extends Exchange{
         'Content-Type': 'application/json',
       }),
     };
-    return  this._http.get<IFTXFundingRateResponse>(this._baseUrl+"funding_rates?limit=120", httpOptions)
+    const start=new Date();
+    start.setHours(start.getHours()-8);
+    const start_timestamp=Math.floor(start.getTime()/1000);
+    return  this._http.get<IFTXFundingRateResponse>(this._baseUrl+"funding_rates?start_time="+start_timestamp, httpOptions)
     .pipe(
       map(response => {
         const result:IFundingRate[] = [];        

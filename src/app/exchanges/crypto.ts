@@ -34,7 +34,7 @@ export class XCrypto{
                 const fris= fr_res.result.data;
                 if(fris.length>0){
                   const fr:IFundingRate={
-                    symbol: fr_res.result.instrument_name.replace('-PERP', ''),
+                    symbol: fr_res.result.instrument_name.replace('-PERP', '').replace(/USD$/gi, 'USDT'),
                     rate: fris[0].v
                   }
                   onFundingRate(fr);
@@ -46,7 +46,7 @@ export class XCrypto{
               if(onError)
                 onError(err);
             },
-            () => console.log('complete')
+            () => {}
           );
           const chanels = [];
           for(let i = 0; i <this.symbols.length; i++){

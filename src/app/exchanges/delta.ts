@@ -35,7 +35,7 @@ export class XDelta{
             msg => {
               if(msg && msg.type=="funding_rate"){
                 const fr_res = msg as IDeltaFundingRate;
-                if(fr_res.symbol.endsWith('BTCT')){
+                if(fr_res.symbol.endsWith('USDT')){
                   const fr:IFundingRate={
                     symbol: fr_res.symbol,
                     rate: fr_res.funding_rate/100
@@ -48,7 +48,7 @@ export class XDelta{
               if(onError)
                 onError(err);
             },
-            () => console.log('complete')
+            () => {}
           );
           
           const request = {
@@ -62,7 +62,6 @@ export class XDelta{
                 ]
             }
           };
-          console.log('send subscription req', request);
           this.socket.next(request);
         }
       }),

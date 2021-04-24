@@ -56,7 +56,8 @@ export class XBitfinex extends Exchange{
     }
     return symbol.replace(/F0$/i, '')
                  .replace(/^UST$/gi, 'USDT')
-                 .replace(/^IOT$/gi, 'IOTA');
+                 .replace(/^IOT$/gi, 'IOTA')
+                 .replace(/^AMP$/gi, 'AMPL');
 
   }
 }
